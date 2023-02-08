@@ -1,0 +1,63 @@
+---
+title: "Feb 6 and 8 in-class practice"
+author: "Yumou"
+date: "2023-02-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+
+Write a function to compute the Euclidean norm of a vector (square root of sum of squared elements in a vector).
+Namely, for a vector $x = (x_1, x_2, \ldots, x_p)$, the Euclidean norm of $x$ is
+$$|x|_2 = (x_1^2 + x_2^2 + \ldots + x_p^2)^{1/2}.$$
+```{r}
+EuclideanNorm = function(yqiu){
+  res = sqrt(sum(yqiu^2))
+  return(res)
+}
+
+EuclideanNorm(c(1 : 5))
+
+EuclideanNorm(-10)
+```
+
+## Question 2
+
+Write a loop function to calculate the Euclidean norm of a vector
+
+```{r}
+x = c(3 : 16)
+
+EuclideanNorm(x)
+
+d = 0
+for (i in 1 : length(x)){
+  d = d + x[i]^2
+  cat("Iteration = ", i, ", value of x =", x[i], "value of d = ", d, "\n")
+}
+sqrt(d)
+
+```
+
+## Question 3
+
+Use loop to write the function for Euclidean norm
+
+```{r}
+EuclideanNormLoop = function(x){
+  d = 0
+  for (i in 1 : length(x)){
+    d = d + x[i]^2
+  }
+  return(sqrt(d))
+}
+
+EuclideanNormLoop(c(-10 : 10))
+
+EuclideanNorm(c(-10 : 10))
+```
+
