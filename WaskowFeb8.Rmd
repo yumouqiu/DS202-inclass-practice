@@ -1,0 +1,76 @@
+---
+title: "WaskowFeb8"
+author: "James Waskow"
+date: "2023-02-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+
+```{r}
+varianceX = function(x){
+  n = length(x)
+  xBar = sum(x) / n
+  xCenter= (x - xBar)
+  return (sum(xCenter^2) / (n-1))
+}
+
+
+
+x = c(1:10)
+varianceX(x)
+
+var(x)
+
+```
+
+## Question 2
+
+Suppose we have data from a Normal distribution with mean $\my^2$ and variance $\sigma^2 = 1$. We want to estimate $\theta = \mu^2$ (true value is 25)
+
+We have 2 estimators 
+1. $\hat{\theta}_1 = \bar{X}^2$ where $\bar{X} = \sum_{i=1}^{n} X_i$
+2.$\hat{theta}_2 = 1/n(n-1)\sum{i \neq j} X_i X_j = \frac{1}{{n-1}}{\bigg(\sum_{i=1}^{n}$
+
+Which is the better estimator?
+
+```{r}
+theta1 = function(x){
+  return (mean(x)^2)
+}
+
+theta2 = function(x){
+  n=length(x)
+  return((sum(x)^2 - sum(x^2)) / (n * (n-1)))
+}
+
+
+#Simulation
+#Suppose the sample size is 20
+#simulation form the normal distribution with mean 5 and variance 1
+#Simulation 1000 times
+
+
+diff1 = c()
+diff2 = c()
+for (rep in 1:1000){
+  z = rnorm(20, 5, 1)
+
+  diff1[rep] = theta1(z)-25
+  diff2[rep] = theta2(z)-25
+  
+}
+
+MSE1 = sqrt(mean(diff1^2))
+MSE2 = sqrt(mean(diff2^2))
+
+MSE1
+MSE2
+```
+
+
+
