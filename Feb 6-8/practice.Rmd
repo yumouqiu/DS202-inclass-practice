@@ -61,3 +61,73 @@ EuclideanNormLoop(c(-10 : 10))
 EuclideanNorm(c(-10 : 10))
 ```
 
+## Question 4
+
+Write a function to calculate sample variance of a vector $x$
+
+```{r}
+myvar = function(x){
+  n = length(x)   # sample size of x
+  xbar = sum(x) / n
+  x.centered = x - xbar
+  res = sum(x.centered^2) / (n - 1)
+  return(res)
+}
+
+myvar(c(-5 : 20))
+
+var(c(-5 : 20)) # R build-in variance function
+
+```
+
+## Question 5 (simulation example)
+
+Suppose we have data from a Normal distribution with mean $\mu = 5$ and variance $\sigma^2 = 1$. We want to estimate $\theta = \mu^2$ (true value is 25).
+
+Suppose $X_1, \ldots, X_n$ are the data. We have two estimators:
+
+1. $\hat{\theta}_1 = \bar{X}^2$ where $\bar{X} = \sum_{i = 1}^{n} X_i$
+
+2. $$\hat{\theta}_2 = \frac{1}{n(n-1)}\sum_{i \neq j} X_i X_j = \frac{1}{n(n-1)} \bigg\{ \bigg( \sum_{i = 1}^{n} X_i \bigg)^2 - \sum_{i = 1}^{n} X_i^2 \bigg\}$$ 
+
+Which is the estimator better?
+
+```{r}
+theta1 = function(x){
+  res = mean(x)^2
+  return(res)
+}
+
+theta2 = function(x){
+  n = length(x)
+  res = (sum(x)^2 - sum(x^2)) / (n * (n - 1))
+  return(res)
+}
+
+# Simulation
+# Suppose the sample size is 20 (n = 20)
+# Simulation from normal distribution with mean 5 and variance 1
+# Simualtion 1000 times
+
+diff1 = c()
+diff2 = c()
+
+for (rep in 1 : 1000){
+  z = rnorm(20, 5, 1)
+  diff1[rep] = theta1(z) - 25
+  diff2[rep] = theta2(z) - 25
+}
+
+hist(diff1)
+hist(diff2)
+
+MSE1 = sqrt(mean(diff1^2))
+MSE2 = sqrt(mean(diff2^2))
+
+MSE1
+
+MSE2
+```
+
+
+
