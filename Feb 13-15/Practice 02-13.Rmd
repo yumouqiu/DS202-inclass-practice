@@ -1,0 +1,14 @@
+---
+title: "Practice Feb 13-15"
+author: "Yumou"
+date: "2023-02-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Summary statistics of *cities* data
+
+## Questions for *cities* data
