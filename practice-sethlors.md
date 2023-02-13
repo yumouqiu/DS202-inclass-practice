@@ -24,7 +24,7 @@ We get NAs because there are missing values in the data set.
 ```
 ?mean
 ?sd
-num_burglaries <- na.omit(num_burglaries)
+num_burglaries = na.omit(num_burglaries)
 mean(num_burglaries)
 sd(num_burglaries)
 ```
