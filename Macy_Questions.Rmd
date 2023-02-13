@@ -1,0 +1,4 @@
+Which cities have the most crime?
+Which city had the most amout of murders in 2006?
+What is the amount of crimes commited in Iowa in 2007?
+How has the amount of crimes commited in Iowa changed over the years?
