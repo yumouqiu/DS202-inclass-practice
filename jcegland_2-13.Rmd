@@ -1,0 +1,14 @@
+```{r} 
+library(classdata)
+data = cities$Burglary
+
+
+mean(data, na.rm = TRUE)
+sd(data, na.rm = TRUE)
+
+```
+
+## Questions I could answer for cities data 
+1. Which city has the max value of any particular crime
+2. Which city has the most violent crime to population ratio 
+
