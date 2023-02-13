@@ -1,0 +1,16 @@
+---
+title: "DSPractice2"
+author: "Pramit Vyas"
+date: "2023-02-13"
+output: html_document
+---
+
+```{R}
+library(classdata)
+cities[1:10,]
+
+mean(cities$Burglary, na.rm=T)
+sd(cities$Burglary, na.rm = T)
+```
+
+I could answer questions that try to see which cities have the highest violent crime rates, and overall crime rates by using a formula that computes these statistics. I could also answer questions about if a larger population can contribute to higher crime. Or if incidences of one type of crime can lead to more of another type of crime.
