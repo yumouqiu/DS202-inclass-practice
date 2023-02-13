@@ -1,0 +1,24 @@
+---
+title: "GregCart-Questions"
+author: "Greg"
+date: "2023-02-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Datasets
+```{r}
+library(classdata)
+
+cities[1:10,]
+mean(cities$Burglary, na.rm = TRUE)
+sd(cities$Burglary, na.rm = TRUE)
+```
+
+## Question
+1) How do robberies/thefts compare over the years in Ames and Des Moins?
+2) How do arson cases vary over the years?
+
