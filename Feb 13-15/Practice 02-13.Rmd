@@ -11,4 +11,30 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Summary statistics of *cities* data
 
+The variable "burglary"
+```{r}
+library(classdata)
+A = cities$Burglary
+
+mean(A, na.rm	= TRUE)
+sd(A, na.rm = TRUE)
+```
+
+
 ## Questions for *cities* data
+
+## Making plots for *fbiwide* data
+
+```{r}
+library(ggplot2)
+
+ggplot(fbiwide, aes(x = log(burglary), y = log(robbery))) + geom_point()
+
+ggplot(fbiwide, aes(x = log(burglary), y = log(motor_vehicle_theft))) + geom_point()
+
+# Add color by years
+
+ggplot(fbiwide, aes(x = log(burglary), y = log(motor_vehicle_theft), colour = year)) + geom_point()
+
+```
+
