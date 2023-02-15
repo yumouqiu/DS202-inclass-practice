@@ -23,6 +23,8 @@ sd(A, na.rm = TRUE)
 
 ## Questions for *cities* data
 
+Please see the questions in the folder "Questions for cities data" in this repository.
+
 ## Making plots for *fbiwide* data
 
 ```{r}
@@ -36,5 +38,69 @@ ggplot(fbiwide, aes(x = log(burglary), y = log(motor_vehicle_theft))) + geom_poi
 
 ggplot(fbiwide, aes(x = log(burglary), y = log(motor_vehicle_theft), colour = year)) + geom_point()
 
+```
+
+## Questions in the lecture "02_r-graphics"
+
+1. Draw a scatterplot of the log transformed number of burglaries by motor vehicle thefts. Map the state variable to colour. Why is this a terrible idea?
+
+```{r}
+ggplot(data = fbiwide, aes(x = log(burglary), y = log(motor_vehicle_theft))) + geom_point(aes(color = state))
+```
+
+This is a bad idea because too many states and colors can not separate each of them.
+
+2. Draw a scatterplot of the log transformed number of burglaries by motor vehicle thefts. Map population to size. How do we interpret the output?
+
+```{r}
+ggplot(data = fbiwide, aes(x = log(burglary), y = log(motor_vehicle_theft))) + geom_point(aes(color = state, size = population))
+```
+
+3. Have a look at the RStudio cheat sheet on visualization. Draw a histogram of the state populations
+
+```{r}
+ggplot(data = fbiwide, aes(x = population)) + geom_histogram()
+```
+The above histogram does not make sense as it includes multiple years for the same state. 
+
+We make the histogram of popualtion for 2019.
+
+```{r}
+ggplot(data = fbiwide[fbiwide$year == 2019, ], aes(x = population)) + geom_histogram()
+```
+
+4. Compare the log transformed number of burglaries by motor vehicle thefts over years. How to make a nice plot?
+
+```{r}
+fbiwide1 = fbiwide
+fbiwide1 = fbiwide1[fbiwide1$year >= 1980, ]
+fbiwide1 = fbiwide1[fbiwide1$year < 2020, ]
+fbiwide1$decade = floor(fbiwide1$year / 10)
+fbiwide1$decade = paste0(fbiwide1$decade, "0s")
+
+ggplot(data = fbiwide1, aes(x = log(burglary), y = log(motor_vehicle_theft))) + geom_point(aes(color = decade))
+```
+
+
+5. Compare the log transformed number of burglaries by motor vehicle thefts over States, coloured by years.
+
+```{r}
+ggplot(data = fbiwide1, aes(x = log(burglary), y = log(motor_vehicle_theft))) + geom_point(aes(color = decade)) + facet_wrap(.~ state_abbr)
+```
+
+
+6. Now, only focus on comparing California, Colorado, Iowa, Illinois, District of Columbia and New York.
+
+```{r}
+state.subset = c("California", "Colorado", "Iowa", "Illinois", "District of Columbia", "New York")
+
+fbiwide2 = fbiwide1[fbiwide1$state %in% state.subset, ]
+ggplot(data = fbiwide2, aes(x = log(burglary), y = log(motor_vehicle_theft))) + geom_point(aes(color = decade)) + facet_wrap(.~ state)
+```
+
+7. We all know population is an important factor. How to compare different states by standardized population?
+
+```{r}
+ggplot(data = fbiwide2, aes(x = log(burglary / population * 66424), y = log(motor_vehicle_theft / population * 66424))) + geom_point(aes(color = decade)) + facet_wrap(.~ state)
 ```
 
