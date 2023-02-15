@@ -1,0 +1,43 @@
+---
+title: "2-13cities"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r}
+library(classdata)
+#calling the first couple of rows
+head(cities)
+#calling mean, but will return NA 
+mean(cities$Burglary)
+#removing null values to get a proper mean
+mean(cities$Burglary, na.rm = TRUE)
+#calling standard deviation, but will return NA
+sd(cities$Burglary)
+#removing null values to get a proper mean
+sd(cities$Burglary, na.rm = TRUE)
+```
+Homework 1
+one person makes a main repository, and the other makes pull requests
+##Question 1
+Is there a correlation between violent.crime and property.crime
+##Question 2
+Which city has the largest total crime?
+##Question 3
+Does crime go up as population goes up?
+##Question 4
+Does crime increase or decrease throughout the years?
+
+
+
+```{r}
+#plotting a scatter plot
+library(ggplot2)
+#if you remove log(), then it is no longer a logarithmic graph
+ggplot(fbiwide, aes(x = log(burglary), y = log(homicide))) + geom_point()
+#adding color
+ggplot(fbiwide, aes(x = log(burglary), y = log(homicide), colour = year)) + geom_point()
+```
+
