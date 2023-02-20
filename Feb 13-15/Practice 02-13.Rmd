@@ -104,3 +104,76 @@ ggplot(data = fbiwide2, aes(x = log(burglary), y = log(motor_vehicle_theft))) + 
 ggplot(data = fbiwide2, aes(x = log(burglary / population * 66424), y = log(motor_vehicle_theft / population * 66424))) + geom_point(aes(color = decade)) + facet_wrap(.~ state)
 ```
 
+## Questions in the lecture "03_r-graphics"
+
+**"Facet" option in ggplot**
+
+1. Plot the number of car thefts by year for each state (facet by state)
+
+```{r}
+ggplot(data = fbiwide, aes(x = year, y = motor_vehicle_theft)) + geom_point() + facet_wrap(~state)
+```
+
+2. The numbers are dominated by the number of thefts in California, New York, and Texas. Use a log-scale for the y-axis.
+
+```{r}
+ggplot(data = fbiwide, aes(x = year, y = log(motor_vehicle_theft))) + geom_point() + facet_wrap(~state)
+```
+
+3. Give each panel its own scale
+
+```{r}
+ggplot(data = fbiwide, aes(x = year, y = motor_vehicle_theft / population)) + geom_point() + facet_wrap(~state, scale = "free_y")
+```
+
+4. Using ggplot2, draw side-by-side boxplots of the number of robberies by state. Use a log transformation on y and compare results
+
+```{r}
+# use fbiwide data
+ggplot(data = fbiwide, aes(x = state, y = log(robbery / population))) + geom_boxplot() + coord_flip()
+
+# use fbi data
+ggplot(data = fbi[fbi$type == "robbery", ], aes(x = state, count / population)) + geom_boxplot() + coord_flip()
+```
+
+5. How to make boxplots comparing across states for different types of crimes?
+
+```{r}
+ggplot(data = fbi[fbi$type %in% c("homicide", "arson", "rape_legacy"), ], aes(x = state, y = count / population)) + geom_boxplot() + coord_flip() + 
+  facet_wrap(~type)
+```
+
+Boxplot of count vs type of crimes, facet by states
+
+```{r}
+ggplot(data = fbi, aes(x = type, y = count / population)) + geom_boxplot() + facet_wrap(~state, scales = "free_y")
+```
+
+**Histogram**
+
+specify number of bins:
+
+```{r}
+ggplot(fbiwide, aes(x = motor_vehicle_theft)) + 
+  geom_histogram(bins = 100) + ggtitle("number of bins = 100")
+```
+
+specify the binwidth:
+```{r}
+ggplot(fbiwide, aes(x = motor_vehicle_theft)) + 
+  geom_histogram(binwidth = 5000) + ggtitle("binwidth = 5000")
+```
+
+density plot by histogram:
+```{r}
+ggplot(fbiwide, aes(x = motor_vehicle_theft)) + 
+  geom_histogram(aes(y = ..density..))
+```
+
+6. A barchart of the variable Violent Crime. Make the height of the bars dependent on the number of reports (use weight). Then facet by type (does the result match your expectation? good! get rid of facetting). Color bars by type.
+
+```{r}
+ggplot(data = fbi, aes(x = violent_crime)) + 
+  geom_bar(aes(weight = count))
+```
+
