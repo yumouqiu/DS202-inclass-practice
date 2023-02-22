@@ -56,3 +56,45 @@ library(tidyverse)
 A1 = dplyr::filter(fbi, year == 2014, state == "Iowa")
 ```
 
+1. Get a subset of all crimes in Iowa, Plot incidences/rates for one type of crime over time.
+
+```{r, warning = FALSE}
+A2 = dplyr::filter(fbi, state == "Iowa")
+ggplot(data = A2, aes(x = year, y = count / population)) + 
+  geom_point() + geom_line() + 
+  facet_wrap(~type, scales = "free_y")
+```
+
+2. Get a subset of all crimes in 2009. Plot the number or rate for one type of crime by state.
+
+```{r}
+A3 = dplyr::filter(fbi, year == 2009, type %in% c("homicide", "arson", "robbery"))
+ggplot(data = A3, aes(x = state)) + 
+  geom_bar(aes(weight = count / population)) + coord_flip() + 
+  facet_wrap(~type, scale = "free")
+```
+
+3. Get a subset of the data that includes number of homicides for the last five years. Find the rate of homicides, extract all states that have a rate of greater than 90% of the rates across all states, and plot 
+
+```{r}
+A4 = dplyr::filter(fbi, year %in% c(2016 : 2020), type == "homicide")
+A4$homicide.rate = A4$count / A4$population * 66000
+quan09 = quantile(A4$homicide.rate, 0.9)
+A5 = dplyr::filter(A4, homicide.rate > quan09)
+
+ggplot(A5, aes(x = state)) + geom_bar(aes(weight = homicide.rate)) + 
+  facet_wrap(~year) + coord_flip()
+```
+
+## "replace" function
+
+Replace the problematic value in life expectancy for Canada in 1957 in the gapminder data set by 69.96.
+
+```{r}
+B = read.csv("gapminder-5060.csv")
+dplyr::filter(B, country == "Canada", year == 1957)
+
+B$lifeExp = replace(B$lifeExp, (B$country == "Canada") & (B$year == 1957), 69.96)
+dplyr::filter(B, country == "Canada", year == 1957)
+```
+
