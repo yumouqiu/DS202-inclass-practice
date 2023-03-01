@@ -138,3 +138,40 @@ levels(fbi2$homicide.reorder.median)[52] = "DC"
 ggplot(fbi2, aes(x = homicide.reorder.median, y = rate)) + geom_boxplot() + coord_flip()
 ```
 
+## Plots for factor variables
+
+Difference between the mappings of "color" and "fill":
+
+```{r}
+ggplot(fbi, aes(x = type, fill=factor(year))) + geom_bar(aes(weight = count)) 
+
+ggplot(fbi, aes(x = type, color=factor(year))) + geom_bar(aes(weight = count)) 
+
+```
+
+## "Titanic" data example
+
+1. Draw a barchart of Gender. Interpret.
+
+```{r}
+ggplot(titanic, aes(x = Sex)) + geom_bar()
+```
+
+2. Map survival to fill color in the barchart of Gender. Interpret.
+
+```{r}
+ggplot(titanic, aes(x = Sex, fill = Survived)) + geom_bar()
+```
+
+3. In the previous barchart change the position parameter to "fill". Interpret.
+
+```{r}
+ggplot(titanic, aes(x = Sex, fill = Survived)) + geom_bar(position = "fill")
+```
+
+4. Other options for position parameter:
+
+```{r}
+ggplot(titanic, aes(x = Sex, fill = Survived)) + geom_bar(position = "dodge2")
+```
+
