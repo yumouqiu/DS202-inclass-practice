@@ -54,8 +54,8 @@ b2 = as.numeric(as.character(fbi1$year.factor)) # works
 Manually reorder the levels of a factor (two ways):
 
 ```{r}
-levels(fbi1$type)
-ggplot(fbi1, aes(x = type)) + geom_bar(aes(weight = count)) + coord_flip() # not ordered
+levels(fbi1$type.factor)
+ggplot(fbi1, aes(x = type.factor)) + geom_bar(aes(weight = count)) + coord_flip() # not ordered
 
 fbi1$type.reorder = factor(fbi1$type, 
                   levels = c("larceny", "burglary", 
@@ -65,16 +65,19 @@ fbi1$type.reorder = factor(fbi1$type,
 levels(fbi1$type.reorder)
 
 ggplot(fbi1, aes(x = type.reorder)) + geom_bar(aes(weight = count)) + coord_flip() # works
+```
 
+The following code would not work:
+
+```{r}
 fbi1$type.reorder.2 = fbi1$type.factor
 levels(fbi1$type.reorder.2)
-levels(fbi1$type.reorder.2) = c("larceny", "burglary", 
-                     "motor_vehicle_theft", "aggravated_assault", 
-                     "robbery", "arson", "rape_legacy", "rape_revised", "homicide")
+levels(fbi1$type.reorder.2) = c("LA", "BU", 
+                     "MVT", "AS", 
+                     "RB", "AR", "RL", "RV", "HO")
 levels(fbi1$type.reorder.2)
 
 ggplot(fbi1, aes(x = type.reorder.2)) + geom_bar(aes(weight = count)) + coord_flip() # not working
-
 ```
 
 "reorder()" function:
@@ -120,3 +123,18 @@ ggplot(fbi1, aes(x = type.reorder.median, y = rate)) + geom_boxplot() + coord_fl
 ```
 
 4. For one type of crime (subset or filter) plot boxplots of rates by state, reorder boxplots by median crime rates
+
+```{r}
+fbi2 = dplyr::filter(fbi1, type == "homicide")
+
+ggplot(fbi2, aes(x = state, y = rate)) + geom_boxplot() + coord_flip()
+
+fbi2$homicide.reorder.median = reorder(fbi2$state, fbi2$rate, FUN = median, na.rm = TRUE)
+
+ggplot(fbi2, aes(x = homicide.reorder.median, y = rate)) + geom_boxplot() + coord_flip()
+
+# change "District of Columbia" to "DC"
+levels(fbi2$homicide.reorder.median)[52] = "DC"
+ggplot(fbi2, aes(x = homicide.reorder.median, y = rate)) + geom_boxplot() + coord_flip()
+```
+
