@@ -1,0 +1,122 @@
+---
+title: "March 01-07"
+author: "Yumou"
+date: "2023-03-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Factor variables
+
+what are the types of variables in the "fbi" data?
+
+```{r, message = FALSE}
+library(classdata)
+library(tidyverse)
+
+str(fbi)
+fbi1 = fbi
+```
+
+Make "year", "state" and "type" as factor variables:
+
+```{r}
+fbi1$state = as.factor(fbi1$state)
+fbi1$type.factor =  as.factor(fbi1$type)
+fbi1$state_abbr = as.factor(fbi1$state_abbr)
+fbi1$year.factor = as.factor(fbi1$year)
+str(fbi1)
+```
+
+Boxplots for factor variables:
+
+```{r, warning = FALSE, message = FALSE}
+twoyear = dplyr::filter(fbi1, year %in% c(1981, 2020))
+
+ggplot(twoyear, aes(x = year, y = count)) + geom_boxplot()
+
+ggplot(twoyear, aes(x = year.factor, y = count)) + geom_boxplot()
+```
+
+Transform factor to numeric variable
+
+```{r}
+b1 = as.numeric(fbi1$year.factor) # not working
+
+b2 = as.numeric(as.character(fbi1$year.factor)) # works
+```
+
+## levels of factors
+
+Manually reorder the levels of a factor (two ways):
+
+```{r}
+levels(fbi1$type)
+ggplot(fbi1, aes(x = type)) + geom_bar(aes(weight = count)) + coord_flip() # not ordered
+
+fbi1$type.reorder = factor(fbi1$type, 
+                  levels = c("larceny", "burglary", 
+                     "motor_vehicle_theft", "aggravated_assault", 
+                     "robbery", "arson", "rape_legacy", "rape_revised", "homicide")
+                  )
+levels(fbi1$type.reorder)
+
+ggplot(fbi1, aes(x = type.reorder)) + geom_bar(aes(weight = count)) + coord_flip() # works
+
+fbi1$type.reorder.2 = fbi1$type.factor
+levels(fbi1$type.reorder.2)
+levels(fbi1$type.reorder.2) = c("larceny", "burglary", 
+                     "motor_vehicle_theft", "aggravated_assault", 
+                     "robbery", "arson", "rape_legacy", "rape_revised", "homicide")
+levels(fbi1$type.reorder.2)
+
+ggplot(fbi1, aes(x = type.reorder.2)) + geom_bar(aes(weight = count)) + coord_flip() # not working
+
+```
+
+"reorder()" function:
+
+```{r}
+levels(reorder(fbi1$type, fbi1$count, na.rm = TRUE))
+
+A1 = dplyr::filter(fbi, type == "aggravated_assault")
+mean(A1$count, na.rm = TRUE)
+
+A2 = dplyr::filter(fbi, type == "arson")
+mean(A2$count, na.rm = TRUE)
+
+A3 = dplyr::filter(fbi, type == "robbery")
+mean(A3$count, na.rm = TRUE)
+
+# reorder based on the summation of "count" variable
+levels(reorder(fbi1$type, fbi1$count, FUN = sum, na.rm = TRUE))
+```
+
+## Practice for factor variable
+
+1. Introduce a rate of the number of reported offenses by population into the fbi data. You could use the Ames standard to make values comparable to a city of the size of Ames (population ~70,000).
+
+```{r}
+fbi1$rate = fbi1$count / fbi1$population * 70000
+```
+
+
+2. Plot boxplots of crime rates by different types of crime. How can you make axis text legible?
+
+```{r, warning=FALSE}
+ggplot(fbi1, aes(x = type, y = rate)) + geom_boxplot() + coord_flip()
+```
+
+
+3. Reorder the boxplots of crime rates, such that the boxplots are ordered by their medians.
+
+```{r, warning=FALSE}
+fbi1$type.reorder.median = reorder(fbi1$type, fbi1$count, FUN = median, na.rm = TRUE)
+
+ggplot(fbi1, aes(x = type.reorder.median, y = rate)) + geom_boxplot() + coord_flip()
+```
+
+4. For one type of crime (subset or filter) plot boxplots of rates by state, reorder boxplots by median crime rates
