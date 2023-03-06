@@ -175,3 +175,107 @@ ggplot(titanic, aes(x = Sex, fill = Survived)) + geom_bar(position = "fill")
 ggplot(titanic, aes(x = Sex, fill = Survived)) + geom_bar(position = "dodge2")
 ```
 
+## Practice questions
+
+1. In the above plots, we cannot see the relationship between class and gender since we make barplot separately for each class. How to show the relationship between class, gender and survive?
+
+```{r, warning = FALSE}
+library(ggmosaic)
+ggplot(data = titanic) +
+  geom_mosaic(aes(x = product(Sex, Class), fill=Survived, weight=1))
+```
+
+2. Choose California and New York, and year 1981 and 2016. Compare State, year and type by the crime rate.
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+fbi.compare = dplyr::filter(fbi, year %in% c(1981, 2016), state %in% c("California", "New York"))
+
+fbi.compare$crime.rate = fbi.compare$count / fbi.compare$population
+fbi.compare$year = factor(fbi.compare$year)
+fbi.compare$state = factor(fbi.compare$state)
+fbi.compare$type = factor(fbi.compare$type)
+
+ggplot(fbi.compare) + 
+  geom_mosaic(aes(x = product(year, state), 
+                  fill = type, 
+                  weight = crime.rate))
+```
+
+3. Rename and reorder the factors appropriately
+
+```{r, message = FALSE, warning = FALSE}
+levels(fbi.compare$type)[1] = "assault"
+levels(fbi.compare$type)[6] = "m.theft"
+levels(fbi.compare$type)[7] = "rape.l"
+levels(fbi.compare$type)[8] = "rape.r"
+
+fbi.compare$type.reorder = fbi.compare$type
+fbi.compare$type.reorder = factor(fbi.compare$type, 
+                                  levels = c("larceny", "burglary", 
+                                             "m.theft", "assault", 
+                                             "robbery", "arson", "rape.l",
+                                             "rape.r", "homicide"))
+
+ggplot(fbi.compare) + 
+  geom_mosaic(aes(x = product(year, state), 
+                  fill = type.reorder, 
+                  weight = crime.rate)) + coord_flip()
+```
+
+## radar plot
+
+```{r}
+library(reshape2)
+
+mean.iris =
+    iris %>% 
+    group_by(Species) %>% 
+    summarise_all("mean") %>% 
+    melt()
+
+coord_radar <- function (theta = "x", start = 0, direction = 1) 
+{
+    theta <- match.arg(theta, c("x", "y"))
+    r <- if (theta == "x") 
+        "y"
+    else "x"
+    ggproto("CordRadar", CoordPolar, theta = theta, r = r, start = start, 
+        direction = sign(direction),
+        is_linear = function(coord) TRUE)
+}
+
+ggplot(mean.iris, aes(x = variable, y = value)) +
+  geom_polygon(aes(group = Species, color = Species), fill = NA, size = 2) +
+  geom_line(aes(group = Species, color = Species), size = 2) +
+  theme(strip.text.x = element_text(size = rel(0.8)),
+        axis.text.x = element_text(size = rel(0.8)),
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank()) +
+  xlab("") + ylab("") +
+  guides(color = "none") +
+  coord_radar()
+```
+
+## Pracice question
+
+Choose `California` and `New York`. Choose Year `1981` and `2016`. Make a radar plot to compare `State`, `Year` and `Type` by the crime rate. Remove `rape.legacy` and `rape.revised` for this plot.
+
+```{r}
+fbi.compare.1 = dplyr::filter(fbi.compare, type != "rape.l", type != "rape.r", type != "homicide", type != "arson")
+fbi.compare.1$type = as.character(fbi.compare.1$type) %>% as.factor()
+fbi.compare.1 = fbi.compare.1 %>% select(state, year, type, crime.rate)
+
+ggplot(fbi.compare.1, aes(x = type, y = crime.rate)) +
+  geom_polygon(aes(group = state, color = state), fill = NA, size = 2) +
+  geom_line(aes(group = state, color = state), size = 2) +
+  facet_wrap(~year) + 
+  theme(strip.text.x = element_text(size = rel(0.8)),
+        axis.text.x = element_text(size = rel(0.8)),
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank()) +
+  xlab("") + ylab("") +
+  guides(color = "none") +
+  coord_radar()
+```
+
