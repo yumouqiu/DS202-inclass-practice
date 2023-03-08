@@ -279,3 +279,84 @@ ggplot(fbi.compare.1, aes(x = type, y = crime.rate)) +
   coord_radar()
 ```
 
+## 'dplyr' package
+
+### pipe operator '%>%'
+
+Let $f(x) = x^2 + 1$, and $g(x, y) = x + y^2$. Use the pipe oprator to calculate $g(f(1), 2)$.
+
+```{r, message = FALSE}
+library(dplyr)
+
+f1 = function(x){
+  return(x^2 + 1)
+}
+
+g1 = function(x, y){
+  return(x + y^2)
+}
+
+g1(f1(1), 2)
+
+1 %>% f1() %>% g1(2)
+```
+
+How about $g(3, f(1))$? This can not be computed using the pipe operator
+
+```{r}
+g1(3, f1(1))
+
+1 %>% f1() %>% g1(3)
+```
+
+Let $h(x) = x^3$. Calculate $h(f(1))$?
+
+```{r}
+h1 = function(x){
+  return(x^3)
+}
+
+1 %>% f1() %>% h1()
+```
+
+## Practice questions
+
+1. Use the `fbi` data, select the recordings for Iowa, calculate the crime rate, ordered by year, crime rate. Lastly, output the data with year, type of crime and crime rate.
+
+```{r}
+library(classdata)
+
+fbi.Iowa = 
+fbi %>% filter(state == "Iowa") %>% 
+  mutate(crime.rate = count / population * 70000) %>%
+  arrange(desc(year), desc(crime.rate)) %>%
+  select(year, type, crime.rate)
+```
+
+2. Compare the crime rate for Iowa, Nebraska and Minnesota. Please calculate the average, 25% and 75% quantile of crime rate for each type of crime.
+
+```{r, message = FALSE}
+fbi.summary = 
+fbi %>% filter(state %in% c("Iowa", "Nebraska", "Minnesota")) %>% 
+  mutate(crime.rate = count / population * 70000) %>%
+  group_by(state, type) %>%
+  summarise(average = mean(crime.rate, na.rm = TRUE),
+            quan25 = quantile(crime.rate, 0.25, na.rm = TRUE),
+            quan75 = quantile(crime.rate, 0.75, na.rm = TRUE))
+```
+
+3. Make a bar plot to view the data, facet by the summary statistics.
+
+```{r}
+library(ggplot2)
+
+fbi.summary %>% ggplot(aes(x = type, fill = state)) + 
+  geom_bar(aes(weight = average), position = "dodge") + coord_flip()
+
+library(reshape2)
+fbi.summary %>% melt() %>% 
+  ggplot(aes(x = type, fill = state)) + 
+  geom_bar(aes(weight = value), position = "dodge") + 
+  facet_wrap(~variable) + coord_flip()
+```
+
