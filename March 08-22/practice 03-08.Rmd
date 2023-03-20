@@ -98,3 +98,69 @@ fbi %>% mutate(crime.rate = count / population * 70000) %>%
   ggplot(aes(x = type.reorder, y = crime.rate)) + geom_boxplot() + coord_flip()
 ```
 
+5. Find the ranks for all rates of crime by type of crime and year. Focus on the top states. Find a visual that shows how often each state managed to take the top spot.
+
+```{r, warning = FALSE}
+fbi = fbi %>% mutate(crime.rate = count / population * 70000)
+fbi.rank = fbi %>% group_by(type, year) %>% mutate(
+  best = rank(crime.rate, na.last = "keep") # ranks from lowest rate to highest rate
+)
+
+fbi.rank %>% filter(best == 1 | best == 2 | best == 3) %>% 
+  ggplot(aes(x = state_abbr)) +
+  geom_bar(aes(fill=factor(best))) + facet_wrap(~type, scales="free") + coord_flip()
+
+```
+
+## French fries data example
+
+```{r}
+data(french_fries, package="reshape2")
+
+french_fries.mean = 
+french_fries %>% group_by(time) %>% summarise(
+  m.potato = mean(potato, na.rm=TRUE),
+  m.buttery = mean(buttery, na.rm=TRUE),
+  m.grassy = mean(grassy, na.rm=TRUE),
+  m.rancid = mean(rancid, na.rm=TRUE),
+  m.painty = mean(painty, na.rm=TRUE)
+)
+
+french_fries.mean %>% ggplot(aes(x = time)) + 
+  geom_point(aes(y = m.potato)) +
+  geom_point(shape=2, aes(y=m.rancid)) + 
+  ylab("Average") + 
+  ggtitle("Comparison of potato and rancid over time")
+```
+
+Draw a plot of the average potato-y rating by time, color by treatment.
+How does this plot look like for the rancid rating?
+
+```{r, message = FALSE}
+avgs.time.trt = french_fries %>% group_by(time, treatment) %>% summarise(
+  m.potato = mean(potato, na.rm=TRUE),
+  m.buttery = mean(buttery, na.rm=TRUE),
+  m.grassy = mean(grassy, na.rm=TRUE),
+  m.rancid = mean(rancid, na.rm=TRUE),
+  m.painty = mean(painty, na.rm=TRUE)
+)
+
+avgs.time.trt %>% ggplot(aes(x = time, y = m.potato, group = treatment, color = treatment)) + 
+  geom_point() + geom_line() + 
+  geom_point(aes(y = m.rancid), shape = 2) + 
+  geom_line(aes(y = m.rancid), linetype = 2) + 
+  ylab("Average values")
+```
+
+## `gather()` and `spread()` functions
+
+```{r}
+library(tidyr)
+
+avgs.time.trt.long = avgs.time.trt %>% gather(key = "variable", value = "value", 3 : 7)
+
+avgs.time.trt.long %>% ggplot(aes(x = time, y = value, col = treatment)) + geom_point(aes(shape = variable)) + 
+  ylab("Average values")
+```
+
+
