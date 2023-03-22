@@ -159,7 +159,7 @@ library(tidyr)
 
 avgs.time.trt.long = avgs.time.trt %>% gather(key = "variable", value = "value", 3 : 7)
 
-avgs.time.trt.long %>% ggplot(aes(x = time, y = value, col = treatment)) + geom_point(aes(shape = variable)) + 
+avgs.time.trt.long %>% ggplot(aes(x = time, y = value, col = treatment, group = interaction(variable, treatment))) + geom_point(aes(shape = variable)) + geom_line(aes(linetype = variable)) + 
   ylab("Average values")
 ```
 
