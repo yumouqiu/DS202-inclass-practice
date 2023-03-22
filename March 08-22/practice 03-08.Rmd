@@ -164,3 +164,44 @@ avgs.time.trt.long %>% ggplot(aes(x = time, y = value, col = treatment, group = 
 ```
 
 
+1. Use gather from the tidyr package to combine the different scales for assessing french fries into a single variable. Call the key-value pair “scale” and “score”.
+
+```{r}
+head(french_fries)
+ff1 = french_fries %>% gather(key = scale, value = score, 5 : 9)
+```
+
+
+2. Use spread from the tidyr package to get a format in which you can directly compare values from week 1 to week 10. Plot a scatterplot of values in week 1 against week 10. Facet by treatment and scale, color by individuals and use different shapes for the replicates. Is there a pattern visible?
+
+```{r, message = FALSE}
+ff2 = ff1 %>% spread(key = time, value = score)
+ff2 %>% ggplot(aes(x = `1`, y = `10`)) + geom_point(aes(color = subject, shape = factor(rep))) + facet_grid(treatment ~ scale)
+```
+
+Can we directly use `spread` function on the original data?
+
+```{r}
+ff3 = french_fries %>% spread(key = time, value = potato)
+```
+
+3. Use gather from the tidyr package to combine the variables for the different types of crimes into one variable. Call the key-value pair “type” and “incidences”. Compute a crime rate.
+
+```{r}
+data("fbiwide", package="classdata")
+fbi.long = fbiwide %>% gather(key = type, value = incidences, 7 : 16) %>%
+  mutate(crime.rate = incidences / population * 70000)
+```
+
+4. Only consider crime rates for Iowa and Minnesota. Use spread to create incidence columns for each of these states. Plot crimes in Iowa against crimes in Minnesota, colour by type of crime. Note: you need to exclude some variables.
+
+```{r, warning = FALSE}
+fbi.IA.MN = fbi.long %>% filter(state == "Iowa" | state == "Minnesota")
+fbi.IA.MN.1 = fbi.IA.MN %>% select(-state_id, -state_abbr, -population, -violent_crime, -incidences) %>%
+  spread(key = state, value = crime.rate)
+
+fbi.IA.MN.1 %>% ggplot(aes(x = Iowa, y = Minnesota)) + 
+  geom_point(aes(color = year)) + facet_wrap(~type, scale = "free") + 
+  geom_abline(slope = 1, intercept = 0)
+```
+
