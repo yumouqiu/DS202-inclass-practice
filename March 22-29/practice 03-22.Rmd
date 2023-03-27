@@ -35,3 +35,18 @@ campaign1 %>% group_by(year) %>% summarise(sum = sum(`Expenditure Amount`)) %>%
   ggplot(aes(x = year)) + geom_bar(aes(weight = sum))
 ```
 
+## Key-value pairs
+
+`box` dataset:
+
+```{r}
+library(classdata)
+head(box, 4)
+
+movies <- box %>% select(Movie, Distributor) %>% unique()
+movies %>% count(Movie) %>% arrange(desc(n))
+
+movies %>% filter(Movie == "Beast")
+box %>% filter(Movie == "Beast") %>% View()
+```
+
