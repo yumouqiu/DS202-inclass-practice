@@ -66,6 +66,8 @@ nasa %>% gather(key = variable, value = value, 7 : 13) %>%
 1. For each movie and distributor, find the (1) highest total gross, (2) the last date (and week) the movie was shown in theaters, (3) the gross the movie made in the first week it was released.
 
 ```{r}
+data(box, package="classdata")
+
 box_summary = box %>% group_by(Movie, Distributor) %>%
   summarise(Gross.final.1 = max(Total.Gross),
             Gross.final.2 = Total.Gross[which.max(Week)],
@@ -94,3 +96,10 @@ box1 %>% ggplot(aes(x = Date, y = Total.Gross,
             data = box_summary1 %>% filter(Gross.final.1 >= 368049635) )
 ```
 
+```{r, warning = FALSE}
+box1 %>% ggplot(aes(x = Date, y = Total.Gross, 
+                    group = interaction(Movie, Distributor))) + geom_line() +
+  ggrepel::geom_text_repel(aes(x = date.last, y = Gross.final.1, label = Movie), 
+            data = box_summary1 %>% filter(Gross.final.1 >= 368049635),
+            colour="grey50")
+```
