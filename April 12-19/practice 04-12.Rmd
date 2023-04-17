@@ -156,3 +156,16 @@ nasa %>% filter(id %in% c("1-1", "1-10")) %>%
             data = nasa %>% filter(id %in% c("1-1", "1-10"), time == 50))
 ```
 
+## Map
+
+```{r}
+library(maps)
+
+states = map_data("state")
+
+states %>% ggplot(aes(x = long, y = lat)) + geom_point()
+
+states %>% ggplot(aes(x = long, y = lat)) + geom_path(aes(group = group))
+
+```
+
