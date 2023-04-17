@@ -90,11 +90,23 @@ box1 = box %>% filter(Movie %in% name.clean)
 ```
 
 ```{r, warning = FALSE}
+box_summary2 = box_summary1 %>% arrange(desc(Gross.final.1))
+box_summary2 = box_summary2[1 : 3, ]
+
+box1 %>% ggplot(aes(x = Date, y = Total.Gross, 
+                    group = interaction(Movie, Distributor))) + geom_line() +
+  geom_text(aes(x = date.last - 500, y = Gross.final.1, label = Movie, color = Movie), 
+            data = box_summary2)
+```
+
+```{r, warning = FALSE}
 box1 %>% ggplot(aes(x = Date, y = Total.Gross, 
                     group = interaction(Movie, Distributor))) + geom_line() +
   geom_text(aes(x = date.last, y = Gross.final.1, label = Movie), 
             data = box_summary1 %>% filter(Gross.final.1 >= 368049635) )
 ```
+
+Non-overlapping text:
 
 ```{r, warning = FALSE}
 box1 %>% ggplot(aes(x = Date, y = Total.Gross, 
@@ -103,3 +115,44 @@ box1 %>% ggplot(aes(x = Date, y = Total.Gross,
             data = box_summary1 %>% filter(Gross.final.1 >= 368049635),
             colour="grey50")
 ```
+
+## Layers
+
+```{r, message = FALSE}
+nasa.1 = nasa %>% filter(id == "1-10") %>% 
+  filter(temperature == max(temperature))
+
+nasa %>% filter(id == "1-1") %>% 
+  ggplot(aes(x = time, y= temperature)) + geom_point() +
+  geom_smooth(method="loess", span = 0.25) + 
+  geom_point(data = nasa %>% filter(id == "1-10"), 
+             aes(x = time, y= temperature), 
+             shape = 2, col = 2) + 
+  geom_smooth(data = nasa %>% filter(id == "1-10"), 
+             aes(x = time, y= temperature), 
+             method="loess", span = 0.25, col = 2) + 
+  geom_text(data = nasa.1, aes(x = time, y = temperature + 0.5, label = temperature), col = "grey50", size = 2.5)
+```
+
+```{r, message = FALSE}
+nasa.2 = nasa %>% filter(id == "1-1") %>% 
+  mutate(season = "winter") %>%
+  mutate(season = replace(season, month %in% c(6, 7, 8), "summer")) %>%
+  mutate(season = replace(season, month %in% c(3, 4, 5), "spring")) %>%
+  mutate(season = replace(season, month %in% c(9, 10, 11), "fall"))
+
+nasa %>% filter(id == "1-1") %>%
+  ggplot(aes(x = time, y= temperature)) + geom_point() +
+  geom_smooth(method="loess", span = 0.25) +
+  geom_text(aes(x = time, y = temperature + 0.2, label = temperature, colour = season), 
+            data = nasa.2, size = 2.5)
+```
+
+```{r, message = FALSE}
+nasa %>% filter(id %in% c("1-1", "1-10")) %>%
+  ggplot(aes(x = time, y= temperature, group = id)) + geom_point(aes(colour=id)) +
+  geom_smooth(method="loess", span = 0.25) +
+  geom_text(aes(x = time, y= temperature, label=id), 
+            data = nasa %>% filter(id %in% c("1-1", "1-10"), time == 50))
+```
+
