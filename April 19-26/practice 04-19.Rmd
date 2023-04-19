@@ -1,0 +1,171 @@
+---
+title: "In-class practice"
+author: "Yumou"
+date: "2023-03-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Time series data
+
+```{r, message = FALSE, warning = FALSE}
+library(tidyverse)
+
+data(nasa, package="GGally")
+```
+
+Choose two locations in `x` and two locations in `y`
+
+```{r}
+nasa %>% filter(x %in% c(1, 2), y %in% c(1, 10)) %>% 
+  mutate(y = factor(y), x = factor(x)) %>%
+  ggplot(aes(x = time, y = temperature, group = id, color = y)) + 
+  geom_line(aes(linetype = x))
+
+```
+
+1. For one location, draw a time line of Ozone over the time frame (time).
+
+```{r}
+nasa %>% filter(x == 1, y == 1) %>%
+  ggplot(aes(x = date, y = ozone)) + geom_line()
+```
+
+2. Plot separate lines for each of the years, i.e. put month on the x-axis and ozone on the y-axis for the same location. Is there a seasonal pattern apparent?
+
+```{r}
+library(lubridate)
+
+nasa %>% filter(x == 1, y == 1) %>% 
+  ggplot(aes(x = month(date, label = TRUE), y = ozone, group = year, color = factor(year))) + geom_line()
+```
+
+3. Pick a location with x in 1:10 and y in 7:10. Plot temperature over time.
+
+```{r}
+nasa %>% filter(x %in% c(1 : 10), y %in% c(7 : 10)) %>% 
+  mutate(y = factor(y), x = factor(x)) %>%
+  ggplot(aes(x = time, y = temperature, group = id, color = x)) + 
+  geom_line() + facet_wrap(~y)
+```
+
+4. Use `gather()` function to put different variables versus time
+
+```{r}
+nasa %>% gather(key = variable, value = value, 7 : 13) %>%
+  filter(x == 2, y == 1) %>% 
+  ggplot(aes(x = month(date, label = TRUE), y = value, group = year, color = year)) + 
+  geom_line() + facet_wrap(~variable, scales = "free_y")
+```
+
+## `Box` data
+
+1. For each movie and distributor, find the (1) highest total gross, (2) the last date (and week) the movie was shown in theaters, (3) the gross the movie made in the first week it was released.
+
+```{r}
+data(box, package="classdata")
+
+box_summary = box %>% group_by(Movie, Distributor) %>%
+  summarise(Gross.final.1 = max(Total.Gross),
+            Gross.final.2 = Total.Gross[which.max(Week)],
+            Gross.initial.1 = min(Total.Gross),
+            Gross.initial.2 = Total.Gross[which.min(Week)],
+            Max.Thtrs = max(Thtrs.),
+            date.last = max(Date),
+            week.count = max(Week)) %>%
+  mutate(Gross.final.diff = Gross.final.1 - Gross.final.2,
+         Gross.initial.diff = Gross.initial.1 - Gross.initial.2)
+
+box_summary1 = box_summary %>% filter(Gross.final.diff == 0,
+                                      Gross.initial.diff == 0,
+                                      Max.Thtrs > 100,
+                                      week.count < 30)
+
+name.clean = box_summary1$Movie
+
+box1 = box %>% filter(Movie %in% name.clean)
+```
+
+```{r, warning = FALSE}
+box_summary2 = box_summary1 %>% arrange(desc(Gross.final.1))
+box_summary2 = box_summary2[1 : 3, ]
+
+box1 %>% ggplot(aes(x = Date, y = Total.Gross, 
+                    group = interaction(Movie, Distributor))) + geom_line() +
+  geom_text(aes(x = date.last - 500, y = Gross.final.1, label = Movie, color = Movie), 
+            data = box_summary2)
+```
+
+```{r, warning = FALSE}
+box1 %>% ggplot(aes(x = Date, y = Total.Gross, 
+                    group = interaction(Movie, Distributor))) + geom_line() +
+  geom_text(aes(x = date.last, y = Gross.final.1, label = Movie), 
+            data = box_summary1 %>% filter(Gross.final.1 >= 368049635) )
+```
+
+Non-overlapping text:
+
+```{r, warning = FALSE}
+box1 %>% ggplot(aes(x = Date, y = Total.Gross, 
+                    group = interaction(Movie, Distributor))) + geom_line() +
+  ggrepel::geom_text_repel(aes(x = date.last, y = Gross.final.1, label = Movie), 
+            data = box_summary1 %>% filter(Gross.final.1 >= 368049635),
+            colour="grey50")
+```
+
+## Layers
+
+```{r, message = FALSE}
+nasa.1 = nasa %>% filter(id == "1-10") %>% 
+  filter(temperature == max(temperature))
+
+nasa %>% filter(id == "1-1") %>% 
+  ggplot(aes(x = time, y= temperature)) + geom_point() +
+  geom_smooth(method="loess", span = 0.25) + 
+  geom_point(data = nasa %>% filter(id == "1-10"), 
+             aes(x = time, y= temperature), 
+             shape = 2, col = 2) + 
+  geom_smooth(data = nasa %>% filter(id == "1-10"), 
+             aes(x = time, y= temperature), 
+             method="loess", span = 0.25, col = 2) + 
+  geom_text(data = nasa.1, aes(x = time, y = temperature + 0.5, label = temperature), col = "grey50", size = 2.5)
+```
+
+```{r, message = FALSE}
+nasa.2 = nasa %>% filter(id == "1-1") %>% 
+  mutate(season = "winter") %>%
+  mutate(season = replace(season, month %in% c(6, 7, 8), "summer")) %>%
+  mutate(season = replace(season, month %in% c(3, 4, 5), "spring")) %>%
+  mutate(season = replace(season, month %in% c(9, 10, 11), "fall"))
+
+nasa %>% filter(id == "1-1") %>%
+  ggplot(aes(x = time, y= temperature)) + geom_point() +
+  geom_smooth(method="loess", span = 0.25) +
+  geom_text(aes(x = time, y = temperature + 0.2, label = temperature, colour = season), 
+            data = nasa.2, size = 2.5)
+```
+
+```{r, message = FALSE}
+nasa %>% filter(id %in% c("1-1", "1-10")) %>%
+  ggplot(aes(x = time, y= temperature, group = id)) + geom_point(aes(colour=id)) +
+  geom_smooth(method="loess", span = 0.25) +
+  geom_text(aes(x = time, y= temperature, label=id), 
+            data = nasa %>% filter(id %in% c("1-1", "1-10"), time == 50))
+```
+
+## Map
+
+```{r}
+library(maps)
+
+states = map_data("state")
+
+states %>% ggplot(aes(x = long, y = lat)) + geom_point()
+
+states %>% ggplot(aes(x = long, y = lat)) + geom_path(aes(group = group))
+
+```
+
