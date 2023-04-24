@@ -81,3 +81,30 @@ fbi.map %>% filter(type == "motor_vehicle_theft") %>%
 
 ```
 
+
+## Plot polishing
+
+```{r}
+p1 = mpg %>% filter(year == 2008) %>%
+  ggplot(aes(x = cty, y = hwy, colour = cyl)) +
+  geom_point()
+
+p1
+
+p2 = mpg %>% filter(year == 2008) %>%
+  ggplot(aes(x = cty, y = hwy, colour = factor(cyl))) +
+  geom_point()
+
+p2 + scale_colour_brewer(palette = "Set1")
+```
+
+```{r}
+mpg %>% ggplot(aes(x = manufacturer)) + geom_bar() + 
+  ggtitle("Bar plot of manufacturers") + 
+  theme(axis.text.x = element_text(angle=45, vjust=1, hjust=1, size=10),
+        axis.title.x = element_text(size=14, face="bold"),
+        axis.ticks.y = element_blank(), 
+        axis.text.y = element_blank(),
+        plot.title = element_text(hjust = 0.5))
+```
+
